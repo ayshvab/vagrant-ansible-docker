@@ -1,0 +1,10 @@
+---    
+- name: anxs.postgresql
+  src: https://github.com/ANXS/postgresql
+  scm: git
+  version: v1.16.0
+- name: geerlingguy.nodejs
+- name: geerlingguy.docker
+  src: https://github.com/geerlingguy/ansible-role-docker
+  scm: git
+  version: 7.1.0

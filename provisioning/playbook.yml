@@ -1,0 +1,64 @@
+- hosts: all
+  # vars:
+  #   db_name: vagrant
+  #   db_user: vagrant
+  #   db_password: vagrant
+  roles:
+    - role: geerlingguy.docker
+      become_user: root
+      become: true
+      vars:
+        docker_users:
+          - vagrant
+    - role: geerlingguy.nodejs
+      become: true
+      vars:
+        nodejs_version: "20.x"
+        nodejs_npm_global_packages:
+          - name: eslint
+          - name: typescript
+          - name: ts-node
+    # - role: anxs.postgresql
+    #   become_user: root
+    #   become: true
+    #   vars:
+    #     - ansible_python_interpreter: "/usr/bin/python3"
+    #     - postgresql_version: 16
+    #     - postgresql_encoding: "UTF-8"
+    #     - postgresql_locale: "en_US.UTF-8"
+    #     - postgresql_ctype: "en_US.UTF-8"
+    #     - postgresql_admin_user: "postgres"
+    #     - postgresql_default_auth_method: "peer"
+    #     - postgresql_databases:
+    #         - name: "{{ db_name }}"
+    #           owner: "{{ db_user }}"
+    #           state: present
+    #     - postgresql_users:
+    #         - name: "{{ db_user }}"
+    #           pass: "{{ db_password }}"
+    #           state: present
+  pre_tasks:
+    - name: Install acl
+      become: true
+      ansible.builtin.apt:
+        name: acl
+        state: present
+    - name: Generate Locale
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+      register: locale_gen_result
+      tags: [locale]
+    - name: Set locale
+      become: true
+      ansible.builtin.command: update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
+      when: locale_gen_result.changed
+      tags: [locale]
+    - name: Programming essential
+      become: true
+      ansible.builtin.apt:
+        name: 
+          - make
+          - build-essential
+        update_cache: true
+        state: present
